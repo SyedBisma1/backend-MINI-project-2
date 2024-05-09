@@ -1,40 +1,38 @@
-const express = require("express");
+import express from "express";
+import { fileURLToPath } from 'url'; 
+import path from "path";
+
+import cors from 'cors';
+import { UserRouter } from "./Routes/user.routes.js";
+
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename); 
+
 const app = express();
-const path =require ("path");
-const userModel = require("./models/user")
+app.use(cors({
+    origin: "*",
+    methods: ["PUT", "GET"] 
+}));
 
-
-app.set("view engine", "ejs")
+app.set("view engine", "ejs");
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
-app.use(express.static(path.join(__dirname,'public')));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.get( '/' ,(req , res )=>{
+app.get('/', (req, res) => {
     res.render("index");
+});
 
-})
-app.get( '/read' ,(req , res )=>{
-    res.render("read");
+// Route handler for rendering read.ejs and passing allUsers data
+app.get('/read', (req, res) => {
+  res.render("read");
+}
+);
 
-})
+app.use("/users", UserRouter);
 
-// error in this part 
-
-app.post( '/create' , async (req , res )=>{
-  let {name , email , image} = req.body;
-
- let createdUser = await userModel.create({
-    name,
-    email,
-    image,
-  })
-
-  res.send(createdUser);
-
-})
-
-
-  
-
-
-app.listen(3000);
+app.listen(3000, () => {
+    console.log("App listen on Port 3000 ");
+});
